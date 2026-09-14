@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# Evan's personal HA setup notes, not part of the add-on
+HA_SETUP.md
