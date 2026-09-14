@@ -10,7 +10,7 @@ Persistent memory for a Home Assistant LLM voice assistant. Architecture in `../
 | `user_name` | How you are referred to in prompts (e.g. "Evan"). |
 | `summarizer_backend` | `ai_task` (default, provider agnostic via Home Assistant's AI Task service), `anthropic` (direct API), or `off`. |
 | `ai_task_entity` | The AI Task entity to use, e.g. `ai_task.claude_ai_task`, `ai_task.openai_ai_task`, `ai_task.google_ai_task`. |
-| `anthropic_api_key` / `anthropic_model` | Only for the `anthropic` backend. |
+| `anthropic_direct` (section) | `api_key` and `model`, used only when `summarizer_backend` is `anthropic`. Leave collapsed otherwise. |
 | `day_boundary_hour` | When a "day" rolls over (default 05:00, so a 1 AM chat belongs to the evening before). |
 | `forget_grace_days` | Forgotten entries stay recoverable this long, then are physically purged. |
 | `timezone` | Defaults to Home Assistant's timezone. |

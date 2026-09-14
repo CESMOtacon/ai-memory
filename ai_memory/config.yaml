@@ -1,5 +1,5 @@
 name: AI Memory
-version: "0.2.0"
+version: "0.2.1"
 slug: ai_memory
 description: Persistent memory, open loops and a searchable notebook for your LLM voice assistant
 url: https://github.com/CESMOtacon/ai-memory
@@ -23,8 +23,9 @@ options:
   user_name: the user
   summarizer_backend: ai_task
   ai_task_entity: ""
-  anthropic_api_key: ""
-  anthropic_model: claude-opus-5
+  anthropic_direct:
+    api_key: ""
+    model: claude-opus-5
   day_boundary_hour: 5
   forget_grace_days: 7
   timezone: ""
@@ -34,8 +35,9 @@ schema:
   user_name: str
   summarizer_backend: list(ai_task|anthropic|off)
   ai_task_entity: str?
-  anthropic_api_key: password?
-  anthropic_model: str
+  anthropic_direct:
+    api_key: password?
+    model: str
   day_boundary_hour: int(0,23)
   forget_grace_days: int(0,365)
   timezone: str?
