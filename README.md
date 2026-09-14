@@ -1,13 +1,36 @@
 # AI Memory for Home Assistant
 
-Persistent memory, open loops and a searchable notebook for any Home Assistant LLM voice assistant
-(Anthropic, OpenAI, Google, Ollama, or anything else that renders a prompt template).
+Give your Home Assistant voice assistant a memory that survives between conversations, so an
+automation can say something, and hours later you can casually refer back to it from a smart
+speaker and be understood.
 
-Home Assistant's conversation history expires after a few minutes. This add-on keeps memory outside
-that: announcements and notable exchanges are written to a notebook, a fixed-size digest of it is
-injected into your assistant's prompt on every turn, and the assistant gets tools to search the full
-archive, track open loops, and forget things on request. Nightly, the day is condensed into a short
-"yesterday" paragraph that carries forward.
+## What it feels like
+
+You tell the assistant you're heading out for a hike. Later, your welcome-home automation fires and
+the assistant greets you with "back from the hike, then?" before running through what it normally
+says. You reply from the kitchen speaker, which is a brand-new voice session with no history, and
+follow up on something the automated announcement mentioned. The assistant knows exactly what
+you're referring to, answers in the context of that announcement, and quietly closes the "out on a
+hike" item it had been tracking.
+
+None of that works out of the box. Home Assistant drops a conversation after a few minutes of
+silence, every satellite starts a fresh session, and an automation's announcement is never part of
+any conversation at all. Each interaction is an island.
+
+## How it works
+
+The add-on keeps a notebook outside Home Assistant's conversation system. Announcements, notable
+exchanges and explicit "remember this" requests are written to it. On every turn, a fixed-size
+digest of the notebook is injected into the assistant's prompt: durable facts about you, open loops
+(things with a future: a pickup window, a pending install, "out on a hike"), a one-paragraph
+summary of yesterday, and today so far. The assistant also gets tools to search the full archive,
+open and close loops, and forget things on request. Each night the day is condensed into the
+"yesterday" paragraph that carries forward, and durable facts are proposed for your approval rather
+than remembered automatically.
+
+Works with any LLM conversation integration that renders a prompt template (Anthropic, OpenAI,
+Google, Ollama and others). Summaries run through Home Assistant's own AI Task service, so no extra
+API keys are needed.
 
 Requires the Mosquitto broker add-on (or any MQTT broker configured in Home Assistant).
 
