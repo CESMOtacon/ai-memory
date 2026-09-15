@@ -143,7 +143,33 @@ variants, strongest first:
 
 "Do not recite the notes" matters. Without it the assistant tends to read the digest back.
 
-## 5. Day to day
+## 5. Keep it cheap: prompt caching
+
+Your agent's request is mostly a large, stable prefix: tool schemas, Home Assistant's exposed-entity
+overview, your instructions, and this digest. With Anthropic that prefix is 15 to 25k tokens. Turn on
+your integration's prompt caching (Anthropic: "System prompt"). The prefix is then written once and
+read at a tenth of the price on every following call while the cache is warm.
+
+The add-on is built to keep that cache warm. The digest is deterministic: it carries no generation
+timestamp, and the sensor is only republished when the digest's bytes actually change. A quiet
+five-minute heartbeat leaves the prompt byte-identical, so the cache survives. A real memory change,
+a new announcement, a loop opened or closed, a "remember this," does update the prompt and
+invalidate the cache, which is the trade-off you want.
+
+Two more lines for your instructions that pay for themselves on Home Assistant:
+
+> Live data: when you call GetLiveContext, always pass the narrowest filter that fits: the entity
+> name when you know it, otherwise a single domain or an area. Never call GetLiveContext without a
+> filter.
+
+Unfiltered, that tool returns every exposed entity with its state, which was 10k tokens on a home
+with 300 exposed entities, on every "is the door locked" question.
+
+The current clock is deliberately not in the digest, because it would change every minute and
+break the cache. Entries carry their own timestamps, and the assistant gets the time from Home
+Assistant's GetDateTime tool when it needs it, so "how long ago did I get home" still works.
+
+## 6. Day to day
 
 - **Open loops** are things with a future: "grocery pickup 2 to 3", "PSU arrived, install pending".
   The assistant opens and closes them with tools; you can also manage them on the status page. They
