@@ -68,13 +68,14 @@ async def main() -> None:
         else:
             log.warning("Unknown MQTT command: %r", cmd)
 
-    mqtt = MqttBridge(settings.mqtt, loop, ctx.ingest, on_connected=ctx.refresh, on_command=on_command,
-                      assistant_name=settings.assistant_name)
+    # On (re)connect, force a publish so the retained topic is restored even if nothing changed.
+    mqtt = MqttBridge(settings.mqtt, loop, ctx.ingest, on_connected=lambda: ctx.refresh(force=True),
+                      on_command=on_command, assistant_name=settings.assistant_name)
     ctx.mqtt = mqtt
     scheduler = Scheduler(ctx)
     ctx.scheduler = scheduler
     mqtt.start()
-    ctx.refresh()
+    ctx.refresh(force=True)
 
     app = build_app(ctx)
     port = int(os.environ.get("AIMEM_PORT", "8099"))

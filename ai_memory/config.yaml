@@ -1,5 +1,5 @@
 name: AI Memory
-version: "0.2.1"
+version: "0.2.2"
 slug: ai_memory
 description: Persistent memory, open loops and a searchable notebook for your LLM voice assistant
 url: https://github.com/CESMOtacon/ai-memory

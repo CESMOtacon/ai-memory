@@ -121,13 +121,17 @@ class MqttBridge:
     def publish_digest(self, d: dict) -> None:
         if not self.configured:
             return
+        # Published only when the digest text changes (or on reconnect), so nothing here is volatile
+        # per heartbeat. State = time of the last semantic change, not the last check.
+        updated = d.get("updated") or d.get("last_check")
         attrs = {
             "prompt_block": d["prompt_block"],
             "today_day": d["today_day"],
             "yesterday_day": d["yesterday_day"],
             "entries_today": d["entries_today"],
             "pending_candidates": d["pending_candidates"],
-            "updated": d["updated"],
+            "updated": updated,
+            "digest_hash": d.get("hash"),
         }
         self.client.publish(ATTR_TOPIC, json.dumps(attrs, ensure_ascii=False), retain=True)
-        self.client.publish(STATE_TOPIC, d["updated"], retain=True)
+        self.client.publish(STATE_TOPIC, updated, retain=True)

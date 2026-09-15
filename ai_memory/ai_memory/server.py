@@ -268,7 +268,7 @@ def build_app(ctx: AppContext) -> Starlette:
     async def action(request: Request) -> Response:
         what = request.path_params["what"]
         if what == "refresh":
-            ctx.refresh()
+            ctx.refresh(force=True)
         elif what == "rollover" and ctx.scheduler is not None:
             await ctx.scheduler.tick(force=True)
         return _back(request)

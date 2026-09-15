@@ -130,8 +130,12 @@ def build(store: Store, user_name: str = "the user", assistant_name: str = "Assi
     yesterday = _yesterday_section(store)
     today = _today_section(store)
     pending = len(store.candidates("pending"))
+    # No generation timestamp here: the block must be byte-identical whenever the underlying
+    # memory is unchanged, or every heartbeat would invalidate the LLM's prompt cache. Entry
+    # timestamps inside the sections carry the chronology; the current clock comes from the
+    # assistant's GetDateTime tool.
     block = (
-        f"[{assistant_name} notebook, updated {now.strftime('%Y-%m-%d %H:%M')}]\n"
+        f"[{assistant_name} notebook]\n"
         f"Long-term facts about {user_name}:\n{facts}\n\n"
         f"Open loops / near future:\n{loops}\n\n"
         f"Yesterday ({yesterday['day']}):\n{yesterday['text']}\n\n"

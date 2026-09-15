@@ -179,5 +179,5 @@ def render_index(ctx: AppContext, prefix: str) -> str:
 <select name="type"><option value="explicit_memory">explicit memory</option><option value="exchange">exchange</option><option value="event">event</option><option value="system">system</option></select>
 <button class="primary">Add</button></form></section>
 </main>
-<footer>Day boundary {ctx.settings.day_boundary_hour:02d}:00 · forget grace period {ctx.settings.forget_grace_days} days · notebook in {esc(ctx.settings.data_dir)} · digest updated {esc(d["updated"][:16].replace("T", " "))}</footer>
+<footer>Day boundary {ctx.settings.day_boundary_hour:02d}:00 · forget grace period {ctx.settings.forget_grace_days} days · notebook in {esc(ctx.settings.data_dir)} · digest last changed {esc((d.get("updated") or "never")[:16].replace("T", " "))} · last check {esc((d.get("last_check") or "")[:16].replace("T", " "))}</footer>
 <script>{JS}</script></body></html>"""
