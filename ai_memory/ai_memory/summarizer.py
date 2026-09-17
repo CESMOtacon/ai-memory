@@ -38,8 +38,11 @@ and the list of currently open loops (each with an id). Produce:
    {user} said they would do) that are not already open. Short imperative phrases. Usually empty.
 3. loops_to_close: ids of open loops the log clearly shows were completed or abandoned. Only ids.
 4. durable_memory_candidates: at most 5 standalone facts that would still be true in a month:
-   stable preferences, people and relationships, ongoing projects, recurring schedules, skills or
-   history {user} shared. Never one-off events, moods, meals, or anything said in passing once.
+   stable preferences, people and relationships, recurring schedules, skills or history {user} shared.
+   Never one-off events, moods, meals, or anything said in passing once. Never a task, plan,
+   intention, search, or anything with a pending outcome: those are open loops, not facts. A durable
+   fact would still be true after every open loop closes. Do not propose anything that is already in
+   the known facts, already pending, or previously rejected, including rephrasings of them.
    Phrase each as a complete sentence about {user}. Prefer an empty list over a weak candidate."""
 
 
@@ -104,9 +107,17 @@ class Summarizer:
         return "off"
 
     # ------------------------------------------------------------- public
-    async def summarize_day(self, day: str, entries: List[dict], open_loops: List[dict]) -> DaySummaryResult:
+    async def summarize_day(self, day: str, entries: List[dict], open_loops: List[dict],
+                            known_facts: Optional[List[str]] = None, pending: Optional[List[str]] = None,
+                            rejected: Optional[List[str]] = None) -> DaySummaryResult:
         loops_text = "\n".join(f"- ({lp['id']}) {lp['text']} [{lp['status']}]" for lp in open_loops) or "(none)"
-        user = f"Day: {day}\n\nOpen loops:\n{loops_text}\n\nRaw log:\n{_entries_text(entries)}"
+        def bullets(items: Optional[List[str]]) -> str:
+            return "\n".join(f"- {t}" for t in (items or [])) or "(none)"
+        user = (f"Day: {day}\n\nOpen loops:\n{loops_text}\n\n"
+                f"Known durable facts (do not re-propose):\n{bullets(known_facts)}\n\n"
+                f"Candidates already pending (do not re-propose):\n{bullets(pending)}\n\n"
+                f"Previously rejected candidates (do not re-propose, including rephrasings):\n{bullets(rejected)}\n\n"
+                f"Raw log:\n{_entries_text(entries)}")
         instr = day_instructions(self.s.assistant_name, self.s.user_name)
         if self.backend == "ai_task":
             data = await self._ai_task("ai_memory_day_summary", instr + "\n\n" + user, DAY_STRUCTURE)

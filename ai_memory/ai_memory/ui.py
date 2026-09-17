@@ -44,7 +44,28 @@ footer{max-width:1180px;margin:18px auto 0;color:var(--muted);font-size:12px}
 """
 
 JS = """
-document.addEventListener('submit',function(e){var f=e.target;if(f.dataset.confirm&&!confirm(f.dataset.confirm))e.preventDefault();});
+// Submit forms in place: post, then swap in the refreshed page so the scroll position survives.
+document.addEventListener('submit', async function (e) {
+  var f = e.target;
+  if (!(f instanceof HTMLFormElement)) return;
+  if (f.dataset.confirm && !confirm(f.dataset.confirm)) { e.preventDefault(); return; }
+  if (!window.fetch || !window.DOMParser) return;  // plain submit + redirect still works
+  e.preventDefault();
+  var y = window.scrollY;
+  var btn = f.querySelector('button'); if (btn) btn.disabled = true;
+  try {
+    var r = await fetch(f.action, {method: 'POST', credentials: 'same-origin',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(new FormData(f)).toString()});
+    var doc = new DOMParser().parseFromString(await r.text(), 'text/html');
+    var nm = doc.querySelector('main'), nh = doc.querySelector('header'), nf = doc.querySelector('footer');
+    if (!nm || !nh) throw new Error('unexpected response');
+    document.querySelector('main').replaceWith(nm);
+    document.querySelector('header').replaceWith(nh);
+    if (nf) document.querySelector('footer').replaceWith(nf);
+    window.scrollTo(0, y);
+  } catch (err) { location.reload(); }
+});
 """
 
 
